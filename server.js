@@ -6,6 +6,8 @@ var RSVP           = require('rsvp');
 var Promise        = RSVP.Promise;
 var exec           = RSVP.denodeify(require('child_process').exec);
 var express        = require('express');
+var cluster        = require('express-cluster');
+var isMaster       = require('cluster').isMaster;
 var AWS            = require('aws-sdk');
 var FastBootServer = require('ember-fastboot-server');
 
@@ -27,14 +29,19 @@ var ZIP_PATH    = 'fastboot-dist.zip';
 
 ensureEnvVars();
 
-removeOldApp()
-  .then(downloadAppZip)
-  .then(unzipApp)
-  .then(startServer)
-  .catch(function(err) {
-    console.log(err);
-    log(err);
-  });
+// The master process is in charge of downloading the application zip
+// file before spinning up child processes.
+if (isMaster) {
+  removeOldApp()
+    .then(downloadAppZip)
+    .then(unzipApp)
+    .then(startServer)
+    .catch(function(err) {
+      log(err);
+    });
+} else {
+  startServer();
+}
 
 // If this server had already downloaded a previous version of the app, delete
 // the directory.
@@ -67,34 +74,39 @@ function downloadAppZip() {
 
 // Unzip `fastboot-dist.zip`
 function unzipApp() {
-  return execAndPrint('unzip ' + ZIP_PATH);
+  return execAndPrint('unzip ' + ZIP_PATH)
+    .then(function() {
+      log("Unzipped " + ZIP_PATH);
+    });
 }
 
 // Start an Express server and use the FastBootServer middleware.
 // We'll automatically find the correct vendor, app and `index.html` files
 // based on the name of the app.
 function startServer() {
-  var app = express();
+  cluster(function() {
+    var app = express();
 
-  var server = new FastBootServer({
-    appFile: findAppFile(),
-    vendorFile: findVendorFile(),
-    htmlFile: findHTMLFile(),
-    ui: {
-      writeLine: function() {
-        log.apply(null, arguments);
+    var server = new FastBootServer({
+      appFile: findAppFile(),
+      vendorFile: findVendorFile(),
+      htmlFile: findHTMLFile(),
+      ui: {
+        writeLine: function() {
+          log.apply(null, arguments);
+        }
       }
-    }
-  });
+    });
 
-  app.get('/*', server.middleware());
+    app.get('/*', server.middleware());
 
-  var listener = app.listen(process.env.PORT || 3000, function () {
-    var host = listener.address().address;
-    var port = listener.address().port;
+    var listener = app.listen(process.env.PORT || 3000, function () {
+      var host = listener.address().address;
+      var port = listener.address().port;
 
-    log('FastBoot server listening at http://%s:%s', host, port);
-  });
+      log('FastBoot server listening at http://%s:%s', host, port);
+    });
+  }, { verbose: true });
 }
 
 function findAppFile() {

@@ -27,6 +27,7 @@
     "aws-sdk": "^2.2.22",
     "ember-fastboot-server": "^0.1.1",
     "express": "^4.13.3",
+    "express-cluster": "0.0.4",
     "fs-extra": "^0.26.2",
     "fs-promise": "^0.3.1",
     "glob": "^6.0.1",
