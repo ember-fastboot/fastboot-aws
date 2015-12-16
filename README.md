@@ -28,10 +28,14 @@ bucket you just created.
 The below instructions cover using the Elastic Beanstalk CLI tool. Feel
 free to use the web console or the API instead.
 
+#### Install `eb`
+
 First, install the [Elastic Beanstalk CLI tool][eb-cli] (`pip install
 awsebcli`) if you don't have it installed already.
 
 [eb-cli]: http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html
+
+#### Initialize the Application
 
 Clone this repository and `cd` into it in your terminal. Initialize the
 directory as an EB application:
@@ -62,6 +66,8 @@ it's running).
 
 Congratulations! You've created an Elastic Beanstalk app.
 
+#### Create an Environment
+
 Next, we'll need to create an environment. I like to create at least one
 environment for staging and one for production.
 
@@ -79,6 +85,8 @@ Once you've entered this information, `eb` will automatically zip up
 the server and deploy it. You'll need to wait a few minutes while the
 entire environment&mdash;security group, load balancer, EC2 instances,
 etc.&mdash;all spin up.
+
+#### Deploy FastBoot App
 
 When that finishes, your server is ready to download the FastBoot bundle
 we created at the beginning and start running your app. Don't worry if
