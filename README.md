@@ -71,10 +71,23 @@ Congratulations! You've created an Elastic Beanstalk app.
 Next, we'll need to create an environment. I like to create at least one
 environment for staging and one for production.
 
-To create an environment, run:
+First, you'll need to gather up some information about your app as we'll
+need to set some environment variables to tell the server where to find
+your FastBoot app.
+
+You'll need:
+
+* The name of your Ember app (e.g., if you ran `ember new my-app`, the
+  name of your app is `my-app`)
+* The S3 bucket you created in the first step
+* The S3 key for the zip file you uploaded
+
+Next, create an environment and pass the appropriate environment
+variables using the `--envvars` option. These options tell the FastBoot
+server where to download your app from.
 
 ```sh
-eb create
+eb create --envvars FASTBOOT_APP_NAME=<app-name>,FASTBOOT_S3_BUCKET=<s3-bucket>,FASTBOOT_S3_KEY=<s3-key>
 ```
 
 Enter a name and a DNS CNAME prefix. (The CNAME prefix is used to create
@@ -86,30 +99,13 @@ the server and deploy it. You'll need to wait a few minutes while the
 entire environment&mdash;security group, load balancer, EC2 instances,
 etc.&mdash;all spin up.
 
-#### Deploy FastBoot App
-
-When that finishes, your server is ready to download the FastBoot bundle
-we created at the beginning and start running your app. Don't worry if
-EB tells you your environment is "Degraded"&mdash;that's just because we
-haven't given it the FastBoot app yet.
-
-We'll point the server at the FastBoot bundle by setting some
-environment variables for this server. In addition to the S3 bucket and
-key, you'll also need the name of your Ember app. (If you typed `ember
-new foo-bar` to create your app, the name of your app is `foo-bar`.)
-
-```sh
-eb setenv FASTBOOT_APP_NAME=<app-name> \
-          FASTBOOT_S3_BUCKET=<bucket>  \
-          FASTBOOT_S3_KEY=<key>
-```
-
-Wait a few minutes for the environment to update with the new
-environment configuration. Once it's complete, you should see your
-cluster move from "Degraded" to "OK".
+After everything has been provisioned, you should see a message saying
+the environment has moved to the "Ok" state.
 
 Congratulations! You've just deployed a cluster of auto-scaling FastBoot
 servers to Elastic Beanstalk.
+
+#### Deploy FastBoot App
 
 > **NOTE**: A cluster of FastBoots is called a stampede.
 
