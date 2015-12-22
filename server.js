@@ -125,7 +125,7 @@ function findFile(name, globPath) {
   var glob = require('glob');
   var files = glob.sync(globPath);
 
-  assert("Found " + files.length + " " + name + " files (expected 1) when globbing '" + globPath + "'.", files.length === 1);
+  assert(files.length === 1, "Found " + files.length + " " + name + " files (expected 1) when globbing '" + globPath + "'.");
 
   return files[0];
 }
