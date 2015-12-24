@@ -27,11 +27,11 @@ var ZIP_PATH    = 'fastboot-dist.zip';
 // 4. Start the FastBoot server, with app, vendor and `index.html` files detected
 //    automatically.
 
-ensureEnvVars();
+var missingEnv = findMissingEnvVars();
 
 // The master process is in charge of downloading the application zip
 // file before spinning up child processes.
-if (isMaster) {
+if (!missingEnv && isMaster) {
   removeOldApp()
     .then(downloadAppZip)
     .then(unzipApp)
@@ -87,18 +87,24 @@ function startServer() {
   cluster(function() {
     var app = express();
 
-    var server = new FastBootServer({
-      appFile: findAppFile(),
-      vendorFile: findVendorFile(),
-      htmlFile: findHTMLFile(),
-      ui: {
-        writeLine: function() {
-          log.apply(null, arguments);
+    if (missingEnv) {
+      app.get('/*', function(req, res) {
+        res.send("Missing environment variable " + missingEnv);
+      });
+    } else {
+      var server = new FastBootServer({
+        appFile: findAppFile(),
+        vendorFile: findVendorFile(),
+        htmlFile: findHTMLFile(),
+        ui: {
+          writeLine: function() {
+            log.apply(null, arguments);
+          }
         }
-      }
-    });
+      });
 
-    app.get('/*', server.middleware());
+      app.get('/*', server.middleware());
+    }
 
     var listener = app.listen(process.env.PORT || 3000, function () {
       var host = listener.address().address;
@@ -130,15 +136,19 @@ function findFile(name, globPath) {
   return files[0];
 }
 
-function ensureEnvVars() {
+function findMissingEnvVars() {
   var requiredEnvs = ['APP_NAME', 'S3_BUCKET', 'S3_KEY'];
 
-  requiredEnvs.forEach(function(name) {
+  for (var i = 0; i < requiredEnvs.length; i++) {
+    var name = requiredEnvs[i];
+
     if (!process.env['FASTBOOT_' + name]) {
       log("Couldn't find required environment variable FASTBOOT_" + name);
-      process.exit(1);
+      return name;
     }
-  });
+  }
+
+  return false;
 }
 
 function log() {
