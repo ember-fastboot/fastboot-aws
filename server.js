@@ -10,10 +10,13 @@ var cluster        = require('express-cluster');
 var isMaster       = require('cluster').isMaster;
 var AWS            = require('aws-sdk');
 var FastBootServer = require('ember-fastboot-server');
+var basicAuth      = require('./basic-auth');
 
 var APP_NAME  = process.env.FASTBOOT_APP_NAME;
 var S3_BUCKET = process.env.FASTBOOT_S3_BUCKET;
 var S3_KEY    = process.env.FASTBOOT_S3_KEY;
+var USERNAME  = process.env.FASTBOOT_USERNAME;
+var PASSWORD  = process.env.FASTBOOT_PASSWORD;
 
 var OUTPUT_PATH = 'fastboot-dist';
 var ZIP_PATH    = 'fastboot-dist.zip';
@@ -86,6 +89,10 @@ function unzipApp() {
 function startServer() {
   cluster(function() {
     var app = express();
+
+    if (USERNAME !== undefined || PASSWORD !== undefined) {
+      app.use(basicAuth(USERNAME, PASSWORD));
+    }
 
     if (missingEnv) {
       app.get('/*', function(req, res) {
