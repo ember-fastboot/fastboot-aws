@@ -12,7 +12,6 @@ var AWS            = require('aws-sdk');
 var FastBootServer = require('ember-fastboot-server');
 var basicAuth      = require('./basic-auth');
 
-var APP_NAME  = process.env.FASTBOOT_APP_NAME;
 var S3_BUCKET = process.env.FASTBOOT_S3_BUCKET;
 var S3_KEY    = process.env.FASTBOOT_S3_KEY;
 var USERNAME  = process.env.FASTBOOT_USERNAME;
@@ -100,9 +99,7 @@ function startServer() {
       });
     } else {
       var server = new FastBootServer({
-        appFile: findAppFile(),
-        vendorFile: findVendorFile(),
-        htmlFile: findHTMLFile(),
+        distPath: OUTPUT_PATH,
         ui: {
           writeLine: function() {
             log.apply(null, arguments);
@@ -122,36 +119,15 @@ function startServer() {
   }, { verbose: true });
 }
 
-function findAppFile() {
-  return findFile("app", path.join(OUTPUT_PATH, "assets", APP_NAME + "*.js"));
-}
-
-function findVendorFile() {
-  return findFile("vendor", path.join(OUTPUT_PATH, "assets", "vendor*.js"));
-}
-
-function findHTMLFile() {
-  return findFile('html', path.join(OUTPUT_PATH, 'index*.html'));
-}
-
-function findFile(name, globPath) {
-  var glob = require('glob');
-  var files = glob.sync(globPath);
-
-  assert(files.length === 1, "Found " + files.length + " " + name + " files (expected 1) when globbing '" + globPath + "'.");
-
-  return files[0];
-}
-
 function findMissingEnvVars() {
-  var requiredEnvs = ['APP_NAME', 'S3_BUCKET', 'S3_KEY'];
+  var requiredEnvs = ['S3_BUCKET', 'S3_KEY'];
 
   for (var i = 0; i < requiredEnvs.length; i++) {
     var name = requiredEnvs[i];
 
     if (!process.env['FASTBOOT_' + name]) {
       log("Couldn't find required environment variable FASTBOOT_" + name);
-      return name;
+      return "FASTBOOT_" + name;
     }
   }
 
