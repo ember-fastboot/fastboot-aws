@@ -26,7 +26,7 @@
   "dependencies": {
     "aws-sdk": "^2.2.22",
     "basic-auth": "^1.0.3",
-    "ember-fastboot-server": "^0.4.2",
+    "ember-fastboot-server": "^0.6.0",
     "express": "^4.13.3",
     "express-cluster": "0.0.4",
     "fs-extra": "^0.26.2",
