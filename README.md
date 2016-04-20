@@ -1,16 +1,34 @@
-## Ember FastBoot for AWS Elastic Beanstalk
+## FastBoot Server for AWS
 
-This is an AWS Elastic Beanstalk-compatible Node.js server for hosting
-an Ember app running in FastBoot mode.
+This is a server for hosting Ember apps in FastBoot mode on AWS. It is
+based on the [FastBoot App
+Server](https://github.com/ember-fastboot/fastboot-app-server),
+configured to use the [S3
+downloader](https://github.com/tomdale/fastboot-s3-downloader) and [S3
+notifier](https://github.com/tomdale/fastboot-s3-notifier).
 
 FastBoot allows Ember apps to be rendered on the server, to support
 things like search crawlers and clients without JavaScript. For more
 information about FastBoot, see
 [ember-cli-fastboot][ember-cli-fastboot].
 
-[ember-cli-fastboot]: https://github.com/tildeio/ember-cli-fastboot
+[ember-cli-fastboot]: https://github.com/ember-fastboot/ember-cli-fastboot
 
-## Deploying
+This server is designed to run either on Elastic Beanstalk or on your
+own EC2 servers. It also works just fine for non-AWS hosting
+environments, such as Heroku or Digital Ocean, if you want to use S3 for
+deploying and storing your built application assets.
+
+This server follows standard Node.js conventions; you can start it with
+either `npm start` or `node server.js` and it respects the `PORT`
+environment variable:
+
+```
+# start the server on HTTP port 80
+$ PORT=80 node server.js
+```
+
+## Deploying on Elastic Beanstalk
 
 ### Create S3 Bucket
 
@@ -19,9 +37,21 @@ application.
 
 ### Create FastBoot Build
 
-Inside your Ember.js application, run `ember fastboot:build`. Once that
-finishes, zip up the resulting `fastboot-dist` and upload it to the S3
-bucket you just created.
+Inside your Ember.js application, run `ember build`. Once that finishes,
+zip up the resulting `dist` directory and upload it to the S3 bucket you
+just created.
+
+Next, create a new file called `fastboot-deploy-info.json`. Edit it to
+have the following contents:
+
+```json
+{
+  "bucket": "BUCKET_YOU_CREATED",
+  "key": "NAME_OF_DIST_ZIP_FILE"
+}
+```
+
+Upload it to the same bucket that you uploaded the zipped `dist` to.
 
 ### Create Elastic Beanstalk Application
 
@@ -71,23 +101,14 @@ Congratulations! You've created an Elastic Beanstalk app.
 Next, we'll need to create an environment. I like to create at least one
 environment for staging and one for production.
 
-First, you'll need to gather up some information about your app as we'll
-need to set some environment variables to tell the server where to find
-your FastBoot app.
+In the environment, we'll tell the server where to find the built app on
+S3 by setting environment variables.
 
-You'll need:
-
-* The name of your Ember app (e.g., if you ran `ember new my-app`, the
-  name of your app is `my-app`)
-* The S3 bucket you created in the first step
-* The S3 key for the zip file you uploaded
-
-Next, create an environment and pass the appropriate environment
-variables using the `--envvars` option. These options tell the FastBoot
-server where to download your app from.
+Create an environment and give it the name of the S3 bucket as well as
+the key to the JSON file you created and uploaded:
 
 ```sh
-eb create --envvars FASTBOOT_APP_NAME=<app-name>,FASTBOOT_S3_BUCKET=<s3-bucket>,FASTBOOT_S3_KEY=<s3-key>
+eb create --envvars FASTBOOT_S3_BUCKET=<s3-bucket>,FASTBOOT_S3_KEY=<s3-key>
 ```
 
 Enter a name and a DNS CNAME prefix. (The CNAME prefix is used to create
@@ -108,8 +129,3 @@ servers to Elastic Beanstalk.
 #### Deploy FastBoot App
 
 > **NOTE**: A cluster of FastBoots is called a stampede.
-
-## Roadmap
-
-This is very beta. Expect improvements, better documentation, and much
-more automation on the deploy side soon.

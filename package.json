@@ -1,7 +1,7 @@
 {
-  "name": "ember-fastboot-elastic-beanstalk",
+  "name": "fastboot-aws",
   "version": "0.1.0",
-  "description": "An Elastic Beanstalk-compatible server for running Ember FastBoot apps",
+  "description": "A FastBoot server for AWS",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,29 +9,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tomdale/ember-fastboot-elastic-beanstalk.git"
+    "url": "git+https://github.com/tomdale/fastboot-aws.git"
   },
   "keywords": [
     "ember",
     "fastboot",
     "aws",
-    "elasticbeanstalk"
+    "elasticbeanstalk",
+    "s3"
   ],
   "author": "Tom Dale <tom@tomdale.net>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tomdale/ember-fastboot-elastic-beanstalk/issues"
+    "url": "https://github.com/tomdale/fastboot-aws/issues"
   },
-  "homepage": "https://github.com/tomdale/ember-fastboot-elastic-beanstalk#readme",
+  "homepage": "https://github.com/tomdale/fastboot-aws#readme",
   "dependencies": {
-    "aws-sdk": "^2.3.4",
-    "basic-auth": "^1.0.3",
-    "ember-fastboot-server": "^0.6.0",
-    "express": "^4.13.3",
-    "express-cluster": "0.0.4",
-    "fs-extra": "^0.26.2",
-    "fs-promise": "^0.3.1",
-    "glob": "^6.0.1",
-    "rsvp": "^3.1.0"
+    "fastboot-app-server": "^0.1.0",
+    "fastboot-s3-downloader": "^0.1.0",
+    "fastboot-s3-notifier": "^0.1.0"
   }
 }
