@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/tomdale/fastboot-aws#readme",
   "dependencies": {
-    "fastboot-app-server": "^0.2.0",
+    "fastboot-app-server": "^1.0.0-beta.1",
     "fastboot-s3-downloader": "^0.2.0",
     "fastboot-s3-notifier": "^0.1.1"
   },
