@@ -105,7 +105,7 @@ In the environment, we'll tell the server where to find the built app on
 S3 by setting environment variables.
 
 Create an environment and give it the name of the S3 bucket as well as
-the key to the JSON file you created and uploaded:
+the name of the JSON file you created and uploaded (i.e., `fastboot-deploy-info.json`):
 
 ```sh
 eb create --envvars FASTBOOT_S3_BUCKET=<s3-bucket>,FASTBOOT_S3_KEY=<s3-key>
