@@ -7,6 +7,7 @@ const FastBootAppServer = require('fastboot-app-server');
 
 const S3_BUCKET    = process.env.FASTBOOT_S3_BUCKET;
 const S3_KEY       = process.env.FASTBOOT_S3_KEY;
+const S3_POLL_TIME = process.env.FASTBOOT_S3_POLL_TIME;
 const REDIS_HOST   = process.env.FASTBOOT_REDIS_HOST;
 const REDIS_PORT   = process.env.FASTBOOT_REDIS_PORT;
 const REDIS_EXPIRY = process.env.FASTBOOT_REDIS_EXPIRY;
@@ -20,7 +21,8 @@ let downloader = new S3Downloader({
 
 let notifier = new S3Notifier({
   bucket: S3_BUCKET,
-  key: S3_KEY
+  key: S3_KEY,
+  poll: S3_POLL_TIME
 });
 
 let cache;
